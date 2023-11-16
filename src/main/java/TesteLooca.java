@@ -5,67 +5,79 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import oshi.SystemInfo;
 
+
+
 import javax.swing.*;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Random;
 
 import static javax.swing.JOptionPane.showInputDialog;
 
 public class TesteLooca {
     public static void main(String[] args) {
         Looca looca = new Looca();
-
+        Random random = new Random();
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        JanelaGrupo windows = new JanelaGrupo(new SystemInfo());
-        SystemInfo sistema  = new SystemInfo();
+        Scanner email = new Scanner(System.in);
+        Scanner senha = new Scanner(System.in);
+        Scanner aleatorio = new Scanner(System.in);
 
-        List<Janela> janelas = windows.getJanelas();
+        System.out.println("Digite seu email: ");
+        String emailUser = email.next();
+        System.out.println("Digite sua senha: ");
+        String senhaUser = senha.next();
 
-        Scanner leitor = new Scanner(System.in);
-
-        String email = String.valueOf(new Scanner(System.in));
-        String senha = String.valueOf(new Scanner(System.in));
-
-        JOptionPane.showInputDialog(null, "Área de Login");
-
-        email = showInputDialog("Digite seu email: ");
-
-        senha = showInputDialog("Digite sua senha: ");
+        Integer numeroAleatorio = random.nextInt(100000);
+        System.out.println("Digite o seguinte número: " + numeroAleatorio);
+        String Inserido = aleatorio.next();
 
         List<Usuario> usuariosBanco = con.query("SELECT email, senha FROM usuario " +
-                        "WHERE email = '%s' AND senha = '%s'".formatted(email, senha),
+                        "WHERE email = '%s' AND senha = '%s'".formatted(emailUser, senhaUser),
                 new BeanPropertyRowMapper<>(Usuario.class));
 
-        if (usuariosBanco.size() < 1) {
-            JOptionPane.showInputDialog(null, "Email e/ou senha inválidos. Inicie novamente o programa.", "ERRO", JOptionPane.ERROR_MESSAGE);
-
+        if (numeroAleatorio.equals(Integer.parseInt(Inserido)) && usuariosBanco.size() < 1) {
+            System.out.println("Informações inválidas");
         } else {
+            System.out.println("Bem-vindo Usuário!");
+            JanelaGrupo windows = new JanelaGrupo(new SystemInfo());
+            SystemInfo sistema = new SystemInfo();
+
+            List<Janela> janelas = windows.getJanelas();
+
+            Scanner leitor = new Scanner(System.in);
             Integer escolha;
             do {
-
-                        showInputDialog("""
-                        *---------------------------------------------------------------*
-                        |      Monitoramento de Janelas da NOCT.U     |   
-                        *---------------------------------------------------------------*
+                System.out.println("Bem vindo Usuário!");
+                System.out.println("""
+                        *-----------------------------------------------*
+                        |       Monitoramento de Janelas da NOCT.U      |  
+                        *-----------------------------------------------*
                         | 1 - Visualizar quantidade de janelas visiveis |
-                        | 2 - Verificar Sistema Operacional                    |
-                        | 0 - Sair                                                                 |
-                        *---------------------------------------------------------------*
-                        Insira também no sistema para validação da opção            
+                        | 2 - Verificar Janelas Visiveis                |
+                        | 3 - Verificar Sistema Operacional             |
+                        | 0 - Sair                                      |
+                        *-----------------------------------------------*            
                         """);
 
                 escolha = leitor.nextInt();
 
-                switch (escolha){
+                switch (escolha) {
                     case 1:
-                    System.out.println("Total das janelas: " + windows.getTotalJanelas());
-                    break;
+                        System.out.println("Total das janelas: " + windows.getTotalJanelas());
+                        break;
+
 
                     case 2:
-                    System.out.println("Sobre o sistema: " + sistema.getOperatingSystem());
-                    break;
+                        System.out.println("Janelas visiveis: " + windows.getJanelasVisiveis());
+                        break;
+
+                    case 3:
+
+                        System.out.println("Sobre o sistema: " + sistema.getOperatingSystem());
+                        break;
                 }
 
             } while (escolha != 0);
